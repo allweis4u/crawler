@@ -6,7 +6,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-class Crawler():
+class CrawlerForFsc():
     
     def __init__(self):
         self.__mainLink = "https://www.fsc.gov.tw/ch/"
@@ -85,7 +85,7 @@ class Crawler():
 
 
 
-crawler = Crawler()
+crawler = CrawlerForFsc()
 urls = crawler.crawlUrls()
 for url in urls:
     print(url)
