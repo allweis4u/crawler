@@ -10,6 +10,15 @@ class FscCrawler():
         self.__mainLink = "https://www.fsc.gov.tw/ch/"
         self.__subLink = "home.jsp?id=131&parentpath=0,2"
 
+    def getResults(self):
+        urls = self.crawlUrls()
+        datas = []
+        for url in urls:
+            time.sleep(0.5)
+            c = self.crawlPageContent(url)
+            datas.append(c)
+        return datas
+
     # 抓取網址列表
     def crawlUrls(self):
         page = 1 # 起始頁面

@@ -8,12 +8,7 @@ app = Flask(__name__)
 @app.route('/website/fsc/content')
 def getFscWebsiteContent():
     crawler = FscCrawler()
-    urls = crawler.crawlUrls()
-    datas = []
-    for url in urls:
-        c = crawler.crawlPageContent(url)
-        datas.append(c)
-    
+    datas = crawler.getResults()
     return json.dumps(datas, ensure_ascii=False)
     
 if __name__ == '__main__':
