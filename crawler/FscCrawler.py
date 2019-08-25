@@ -4,7 +4,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-class CrawlerForFsc():
+class FscCrawler():
     
     def __init__(self):
         self.__mainLink = "https://www.fsc.gov.tw/ch/"
@@ -57,36 +57,30 @@ class CrawlerForFsc():
         return newLinks
 
     # 抓取內頁
-    def crawlPageContent(self, link):
-        time.sleep(1)
+    def crawlPageContent(self, url):
+        results = {}
+        results["url"] = url
 
-        r = requests.post(link, data={})
+        r = requests.post(url, data={})
         soup = BeautifulSoup(r.text, features='lxml')
-        bsContent = soup.find("div", id="maincontent")
+        mainSoup = soup.find("div", id="maincontent")
 
-        if bsContent is None:
-            errors = [
-                "crawlPageContent", 
-                "Not found maincontent where html = " + str(soup)
-            ]
-            raise Exception(",".join(errors))
+        # 取出標題
+        titleObj = mainSoup.find("h3")
+        if titleObj:
+            results["title"] = titleObj.get_text().strip()
+        
+        # 取出內文
+        contentObj = mainSoup.find(class_="page_content")
+        contentObj.find(class_="contentdate").extract() # 把日期抽掉
+        #results["content"] = contentObj.get_text().strip()
+        results["content"] = self.trimHtmlTags( str(contentObj) ).strip()
+        
+        return results
 
-        res = bsContent.find("div", class_="page_content").find_all("div")
-        if len(res) < 2:
-            errors = [
-                "crawlWebsiteDoc",
-                "Not found page_content where html = " + str(res)
-            ]
-            raise Exception(",".join(errors))
+    # 去除Html tag
+    def trimHtmlTags(self, text):
+        text = re.sub(r"</?(div|p)[^<]*>|<br/>", "\n", text) # 取代成換行
+        text = re.sub(r"</?[^<]*>", "", text)
+        return text
 
-        return str(bsContent)
-
-
-
-crawler = CrawlerForFsc()
-urls = crawler.crawlUrls()
-for url in urls:
-    print(url)
-    c = crawler.crawlPageContent(url)
-    print(c)
-    break
